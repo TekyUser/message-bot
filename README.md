@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Messenger Bot Admin Panel
 
-## Getting Started
+This adds an admin panel for managing Messenger keyword/response rules.
 
-First, run the development server:
+## Features
 
-```bash
+- `/admin/login` admin login
+- `/admin` rule management
+- Add keyword + response
+- Edit rules
+- Enable/disable rules
+- Delete rules
+- Messenger webhook reads rules from Supabase
+- Case-insensitive exact keyword matching
+- Ignores Messenger echo events
+
+## 1. Install
+
+This project expects an existing Next.js app.
+
+Install no extra npm package for this implementation. It uses the Supabase REST API directly.
+
+Make sure your existing app has the `@/*` import alias pointing to the project root (the default Next.js setup usually does).
+
+## 2. Supabase
+
+Create a Supabase project.
+
+Open:
+
+Supabase Dashboard -> SQL Editor
+
+Run `supabase/schema.sql`.
+
+Then copy your project URL and service-role key.
+
+IMPORTANT: `SUPABASE_SERVICE_ROLE_KEY` must only exist as a server-side environment variable. Never expose it in client code.
+
+## 3. Environment variables
+
+Add these to Vercel:
+
+SUPABASE_URL
+SUPABASE_SERVICE_ROLE_KEY
+ADMIN_PASSWORD
+ADMIN_SESSION_SECRET
+META_VERIFY_TOKEN
+META_PAGE_ACCESS_TOKEN
+META_GRAPH_API_VERSION
+
+Use the current Graph API version shown for your Meta app for `META_GRAPH_API_VERSION`.
+
+Example:
+
+META_GRAPH_API_VERSION=vXX.X
+
+Do not copy the example version literally.
+
+## 4. Copy files
+
+Copy the `app`, `lib`, and `supabase` folders into your existing Next.js project.
+
+The new webhook replaces your existing `app/api/webhook/route.ts`.
+
+## 5. Run locally
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000/admin/login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Log in with `ADMIN_PASSWORD`.
 
-## Learn More
+## 6. Deploy
 
-To learn more about Next.js, take a look at the following resources:
+Commit/push to GitHub and deploy to Vercel.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Then open:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+https://YOUR-DOMAIN.vercel.app/admin/login
 
-## Deploy on Vercel
+Add:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Keyword:
+secret
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Response:
+ive spent 18 hours to do this
+
+Send `secret` to the Page.
+
+The webhook will query Supabase and automatically send the stored response.
+
+## Important
+
+Do not put Meta access tokens or the Supabase service-role key into client-side code.
+
+The admin panel API is protected by an HTTP-only session cookie.
